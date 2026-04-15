@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LernyTube – Session</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="app-page session-page">
+
+  <header class="app-header">
+    <div class="header-left">
+      <a href="/dashboard" class="back-link">← Zurück</a>
+      <span class="logo-icon-wrap small">▶</span>
+      <span id="session-title-display" class="header-title">Lädt…</span>
+    </div>
+    <div class="header-right">
+      <span id="session-date-display" class="date-badge"></span>
+      <button class="btn-ghost" onclick="logout()">Abmelden</button>
+    </div>
+  </header>
+
+  <div class="session-layout">
+
+    <!-- Linke Seite: Video -->
+    <div class="video-panel">
+      <div class="video-wrapper">
+        <div id="youtube-player"></div>
+      </div>
+      <div id="video-title-display" class="video-title-heading" style="display:none;font-size:14px;color:#aaa;padding:6px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title=""></div>
+      <div class="video-controls">
+        <button class="btn-snapshot" onclick="createSnapshot()">
+          📸 &nbsp;Snapshot erstellen
+        </button>
+        <span class="time-label">Aktuelle Zeit:</span>
+        <span id="current-time-display" class="time-display">0:00</span>
+      </div>
+    </div>
+
+    <!-- Rechte Seite: Snapshots -->
+    <div class="snapshots-panel">
+      <div class="snapshots-header">
+        <h3>Snapshots <span id="snapshot-count" class="count-badge">0</span></h3>
+        <div class="export-buttons">
+          <button class="btn-export" onclick="exportMarkdown()" title="Als Markdown-Datei herunterladen">⬇ MD</button>
+          <button class="btn-export" onclick="exportPdf()" title="Als PDF speichern">⬇ PDF</button>
+        </div>
+      </div>
+      <div id="snapshots-list" class="snapshots-list">
+        <div class="empty-state">
+          Noch keine Snapshots.<br>
+          Klicke auf <strong>📸 Snapshot erstellen</strong> um einen hinzuzufügen.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal: Snapshot vergrößert anzeigen / bearbeiten -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeSnapshotModal()"></div>
+  <div id="snapshot-modal" class="modal snapshot-modal hidden">
+    <div class="modal-header">
+      <div class="modal-timestamp-wrap">
+        <span class="modal-ts-icon">🎬</span>
+        <span id="modal-timestamp" class="modal-timestamp"></span>
+        <button class="btn-ts-jump" onclick="jumpToModalTimestamp()" title="Video an dieser Stelle abspielen">▶ Abspielen</button>
+      </div>
+      <button class="btn-icon" onclick="closeSnapshotModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-thumbnail" class="modal-thumbnail"></div>
+      <textarea
+        id="modal-notes"
+        class="modal-notes"
+        placeholder="Deine Notizen hier eingeben…"
+        oninput="markDirty()"
+      ></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-danger" onclick="deleteCurrentSnapshot()">🗑 Löschen</button>
+      <button class="btn-primary" onclick="saveModalNotes()">💾 Speichern</button>
+    </div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/session.js"></script>
+</body>
+</html>

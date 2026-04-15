@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LernyTube – Meine Sessions</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=1775335446">
+</head>
+<body class="app-page">
+
+  <header class="app-header">
+    <div class="header-left">
+      <span class="logo-icon-wrap small">▶</span>
+      <span class="header-title">LernyTube</span>
+    </div>
+    <div class="header-right">
+      <span id="username-display" class="username-badge"></span>
+      <button class="btn-ghost" onclick="logout()">Abmelden</button>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="dashboard-top">
+      <h2>Meine Lernsessions</h2>
+      <button class="btn-primary" onclick="openModal()">+ Neue Session</button>
+    </div>
+
+    <div class="search-wrap">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Sessions und Notizen durchsuchen..."
+        oninput="filterSessions(this.value)"
+      >
+    </div>
+
+    <!-- Tag-Filterleiste (erscheint sobald Tags vorhanden) -->
+    <div id="tag-filter-bar" class="tag-filter-bar hidden">
+      <span class="tag-filter-label">Filtern:</span>
+      <div id="tag-filter-chips" class="tag-filter-chips"></div>
+    </div>
+
+    <div id="sessions-grid" class="sessions-grid">
+      <div class="loading-state">Lade Sessions…</div>
+    </div>
+
+    <!-- Snapshot-Suchergebnisse (nur sichtbar während aktiver Suche) -->
+    <div id="snapshot-results" class="hidden"></div>
+  </main>
+
+  <!-- Modal: Neue Session -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()"></div>
+  <div id="new-session-modal" class="modal hidden">
+    <div class="modal-header">
+      <h3>Neue Lernsession</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <form onsubmit="createSession(event)">
+      <div class="form-group">
+        <label>Titel</label>
+        <input type="text" id="session-title" required placeholder="z.B. Python Kurs – Tag 1">
+      </div>
+      <div class="form-group">
+        <label>Datum</label>
+        <input type="date" id="session-date" required>
+      </div>
+      <div class="form-group">
+        <label>YouTube-Link</label>
+        <input type="text" id="session-video-url" required placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+
+      <!-- Tag-Eingabe -->
+      <div class="form-group">
+        <label>Tags <span class="form-optional">(optional, max. 8)</span></label>
+        <div class="tag-input-wrap" id="tag-input-wrap" onclick="document.getElementById('tag-text').focus()">
+          <div id="tag-badges-input" class="tag-badges-input"></div>
+          <input
+            type="text"
+            id="tag-text"
+            class="tag-text-field"
+            placeholder="Tag eingeben…"
+            autocomplete="off"
+            oninput="onTagInput(this.value)"
+            onkeydown="onTagKeydown(event)"
+            onfocus="showTagSuggestions(this.value)"
+            onblur="hideTagSuggestions()"
+          >
+        </div>
+        <div id="tag-suggestions" class="tag-suggestions hidden"></div>
+      </div>
+
+      <p id="session-error" class="error-msg hidden"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Abbrechen</button>
+        <button type="submit" class="btn-primary">Session erstellen</button>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- Modal: Nutzungsbedingungen (nicht schließbar) -->
+  <div id="tosModal" class="tos-modal hidden">
+    <div class="tos-modal-box">
+      <div class="tos-modal-header">
+        <div class="brand-icon-small">&#9654;</div>
+        <span>LernyTube &ndash; Nutzungsbedingungen</span>
+      </div>
+      <div class="tos-modal-body" id="tos-content">
+        <div class="tos-loading">Wird geladen&hellip;</div>
+      </div>
+      <div class="tos-modal-footer">
+        <label class="tos-checkbox-wrap">
+          <input type="checkbox" id="tos-checkbox" onchange="document.getElementById('tos-accept-btn').disabled=!this.checked">
+          Ich habe die Nutzungsbedingungen gelesen und stimme ihnen zu.
+        </label>
+        <button id="tos-accept-btn" class="btn-primary" disabled onclick="acceptTos()">
+          Zustimmen &amp; fortfahren
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/api.js?v=1775335446"></script>
+  <script src="/static/js/dashboard.js?v=1775335446"></script>
+</body>
+</html>

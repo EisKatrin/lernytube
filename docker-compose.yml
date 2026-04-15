@@ -1,0 +1,29 @@
+services:
+  lernytube:
+    build: ./backend
+    container_name: lernytube-app
+    restart: unless-stopped
+    networks:
+      - mongodb_default
+    env_file:
+      - .env
+    environment:
+      - MONGO_DB=lernytube_db
+      - JWT_EXPIRE_HOURS=48
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.lernytube.rule=Host(`lernytube.eiskopani.de`)
+      - traefik.http.routers.lernytube.entrypoints=websecure
+      - traefik.http.routers.lernytube.tls=true
+      - traefik.http.routers.lernytube.tls.certresolver=letsencrypt
+      - traefik.http.services.lernytube.loadbalancer.server.port=8000
+    volumes:
+      - yt-dlp-cache:/app/yt-dlp-cache
+      - ./backend/static/uploads:/app/static/uploads
+
+volumes:
+  yt-dlp-cache:
+
+networks:
+  mongodb_default:
+    external: true

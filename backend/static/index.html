@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LernyTube – Mit YouTube smarter lernen</title>
+  <link rel="stylesheet" href="/static/css/landing.css?v=20260406">
+</head>
+<body>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="brand-icon">▶</div>
+        <span class="brand-name">LernyTube</span>
+      </div>
+      <div class="nav-actions">
+        <a href="#auth-section" class="nav-link" onclick="showTab('login')">Anmelden</a>
+        <a href="#auth-section" class="btn-gold btn-sm" onclick="showTab('register')">Registrieren</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1>Lerne smarter<br>mit YouTube</h1>
+        <p class="hero-sub">Pausiere Videos an wichtigen Stellen, mach Snapshots und schreib deine Notizen dazu. So wird aus passivem Zuschauen aktives Lernen.</p>
+        <div class="hero-buttons">
+          <a href="#auth-section" class="btn-gold btn-lg" onclick="showTab('register')">Kostenlos starten</a>
+          <button class="btn-outline btn-lg" onclick="loginAsDemo()">Demo ausprobieren</button>
+        </div>
+        <p class="hero-hint">Keine Kreditkarte · Keine Werbung · 100% kostenlos</p>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-mockup">
+          <div class="mockup-header">
+            <span class="mockup-dot"></span>
+            <span class="mockup-dot"></span>
+            <span class="mockup-dot"></span>
+            <span class="mockup-title">Python Grundlagen – Session</span>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-video">▶ 3:00</div>
+            <div class="mockup-snapshots">
+              <div class="mockup-snap">
+                <span class="snap-time">3:00</span>
+                <span class="snap-text">Was ist eine Variable? – Variablen sind wie beschriftete Boxen im Speicher…</span>
+              </div>
+              <div class="mockup-snap">
+                <span class="snap-time">9:00</span>
+                <span class="snap-text">Strings – Text in Anführungszeichen, len() gibt die Länge zurück…</span>
+              </div>
+              <div class="mockup-snap active">
+                <span class="snap-time">15:00</span>
+                <span class="snap-text">int vs float – Division / ergibt immer float!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SO FUNKTIONIERT'S ═══ -->
+  <section class="steps">
+    <div class="section-inner">
+      <h2 class="section-title">So funktioniert's</h2>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-icon">🎬</div>
+          <h3>Video hinzufügen</h3>
+          <p>Füge eine YouTube-URL ein und starte deine Lernsession.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-icon">📸</div>
+          <h3>Snapshots machen</h3>
+          <p>Pausiere bei wichtigen Stellen und erstelle Snapshots mit Zeitstempel.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-icon">✏️</div>
+          <h3>Notizen schreiben</h3>
+          <p>Schreib in eigenen Worten auf, was du gelernt hast. Durchsuchbar und exportierbar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURES ═══ -->
+  <section class="features-section">
+    <div class="section-inner">
+      <h2 class="section-title">Alles was du brauchst</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📷</div>
+          <h3>Snapshots mit Screenshots</h3>
+          <p>Erstelle Snapshots per Klick oder füge eigene Screenshots per Strg+V ein – das Bild wird direkt zur Notiz gespeichert.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Volltextsuche</h3>
+          <p>Durchsuche alle deine Notizen auf einen Schlag. Finde sofort die Stelle, die du vor Wochen notiert hast.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏷️</div>
+          <h3>Tags & Organisation</h3>
+          <p>Kategorisiere Sessions mit Tags. Filtere nach Themen und behalte den Überblick.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h3>Export als MD & PDF</h3>
+          <p>Exportiere deine Notizen als Markdown oder PDF – perfekt zum Wiederholen oder Teilen.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⏱️</div>
+          <h3>Zeitstempel-Navigation</h3>
+          <p>Klicke auf einen Snapshot und springe direkt zur Stelle im Video. Kein langes Suchen mehr.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Privat & sicher</h3>
+          <p>Deine Daten bleiben auf unserem Server. Kein Tracking, keine Werbung, keine Weitergabe.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ AUTH SECTION ═══ -->
+  <section id="auth-section" class="auth-section">
+    <div class="section-inner auth-layout">
+      <div class="auth-info">
+        <h2>Jetzt loslegen</h2>
+        <p>Erstelle dein kostenloses Konto und starte deine erste Lernsession in unter einer Minute.</p>
+        <div class="auth-info-or">
+          <span class="or-line"></span>
+          <span class="or-text">oder</span>
+          <span class="or-line"></span>
+        </div>
+        <button class="btn-outline btn-lg full-width" onclick="loginAsDemo()">Demo ausprobieren</button>
+        <p class="demo-hint">Keine Registrierung nötig – schau dir an, wie LernyTube funktioniert.</p>
+      </div>
+      <div class="auth-box">
+        <div class="auth-tabs">
+          <button class="tab-btn active" onclick="showTab('login')">Anmelden</button>
+          <button class="tab-btn" onclick="showTab('register')">Registrieren</button>
+        </div>
+
+        <!-- Login -->
+        <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Benutzername</label>
+            <input type="text" id="login-username" required placeholder="Dein Benutzername">
+          </div>
+          <div class="form-group pwd-wrap">
+            <label>Passwort</label>
+            <input type="password" id="login-password" required placeholder="Dein Passwort">
+            <button type="button" class="eye-btn" onclick="togglePwd('login-password', this)">👁</button>
+          </div>
+          <button type="submit" class="btn-gold full-width">Anmelden</button>
+          <p class="switch-hint">Noch kein Konto? <a href="#" onclick="showTab('register');return false;">Jetzt registrieren</a></p>
+        </form>
+
+        <!-- Registrieren -->
+        <form id="register-form" class="auth-form hidden" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label>Benutzername</label>
+            <input type="text" id="reg-username" required placeholder="Wähle einen Benutzernamen">
+            <span class="field-error" id="err-username"></span>
+          </div>
+          <div class="form-group">
+            <label>E-Mail</label>
+            <input type="email" id="reg-email" required placeholder="Deine E-Mail-Adresse">
+            <span class="field-error" id="err-email"></span>
+          </div>
+          <div class="form-group pwd-wrap">
+            <label>Passwort</label>
+            <input type="password" id="reg-password" required placeholder="Mindestens 16 Zeichen" oninput="checkPasswordHints(this.value)">
+            <button type="button" class="eye-btn" onclick="togglePwd('reg-password', this)">👁</button>
+            <ul class="password-hints">
+              <li id="hint-length">✗ Mindestens 16 Zeichen</li>
+              <li id="hint-upper">✗ Mindestens ein Großbuchstabe</li>
+              <li id="hint-special">✗ Mindestens ein Sonderzeichen (!@#$%^&amp;*...)</li>
+            </ul>
+            <span class="field-error" id="err-password"></span>
+          </div>
+          <div class="form-group pwd-wrap">
+            <label>Passwort bestätigen</label>
+            <input type="password" id="reg-password-confirm" required placeholder="Passwort wiederholen">
+            <button type="button" class="eye-btn" onclick="togglePwd('reg-password-confirm', this)">👁</button>
+            <span class="field-error" id="err-password-confirm"></span>
+          </div>
+          <button type="submit" class="btn-gold full-width">Konto erstellen</button>
+          <p class="switch-hint">Bereits registriert? <a href="#" onclick="showTab('login');return false;">Jetzt anmelden</a></p>
+        </form>
+
+        <p id="auth-error" class="auth-error hidden"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="site-footer">
+    <p class="footer-note">Diese Seite verfolgt keine kommerziellen Absichten und dient ausschließlich dem privaten Gebrauch.</p>
+    <nav class="footer-links">
+      <a onclick="document.getElementById('impressumModal').classList.add('open')">Impressum</a>
+      <a onclick="document.getElementById('kontaktModal').classList.add('open')">Kontakt</a>
+      <a onclick="document.getElementById('datenschutzModal').classList.add('open')">Datenschutzerklärung</a>
+    </nav>
+    <p class="footer-copy">&copy; 2026 LernyTube &middot; eiskopani.de</p>
+  </footer>
+
+  <!-- ═══ LEGAL MODALS ═══ -->
+  <div id="impressumModal" class="legal-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="legal-modal-content">
+      <button class="legal-modal-close" onclick="document.getElementById('impressumModal').classList.remove('open')">&times;</button>
+      <h2>Impressum</h2>
+      <p>Angaben gemäß § 5 TMG</p>
+      <p><strong>Betreiber:</strong><br>Ekaterina Eisfeld<br>Ottweilerstraße 46<br>66113 Saarbrücken<br>Deutschland</p>
+      <p><strong>Kontakt:</strong><br>E-Mail: <a href="mailto:e.eisfeld@t-online.de">e.eisfeld@t-online.de</a></p>
+      <p><strong>Hinweis:</strong> Diese Website wird rein privat betrieben und verfolgt keinerlei kommerzielle Absichten.</p>
+    </div>
+  </div>
+
+  <div id="kontaktModal" class="legal-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="legal-modal-content">
+      <button class="legal-modal-close" onclick="document.getElementById('kontaktModal').classList.remove('open')">&times;</button>
+      <h2>Kontakt</h2>
+      <p>Du hast Fragen oder Anmerkungen? Ich freue mich über deine Nachricht.</p>
+      <p><strong>E-Mail:</strong><br><a href="mailto:e.eisfeld@t-online.de">e.eisfeld@t-online.de</a></p>
+      <p>Diese Seite wird privat betrieben — bitte habe Verständnis, dass Anfragen nur nach Möglichkeit beantwortet werden können.</p>
+    </div>
+  </div>
+
+  <div id="datenschutzModal" class="legal-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="legal-modal-content">
+      <button class="legal-modal-close" onclick="document.getElementById('datenschutzModal').classList.remove('open')">&times;</button>
+      <h2>Datenschutzerklärung</h2>
+      <h3>1. Allgemeines</h3>
+      <p>Diese Website wird ausschließlich privat betrieben und verfolgt keine kommerziellen Absichten. Deine Daten werden nicht an Dritte weitergegeben, nicht verkauft und nicht für Werbezwecke genutzt.</p>
+      <h3>2. Welche Daten werden gespeichert?</h3>
+      <p>Zur Nutzung der Anwendung ist eine Anmeldung erforderlich. Es werden lediglich der gewählte Benutzername, das Passwort (verschlüsselt) sowie die von dir eingetragenen Lerndaten gespeichert.</p>
+      <h3>3. Wo werden die Daten gespeichert?</h3>
+      <p>Alle Daten verbleiben auf dem privaten Server und verlassen diesen nicht. Es werden keine externen Analysedienste, Tracking-Tools oder Cookies von Drittanbietern eingesetzt.</p>
+      <h3>4. Deine Rechte</h3>
+      <p>Du kannst jederzeit die Löschung deiner Daten verlangen. Wende dich dazu per E-Mail an: <a href="mailto:e.eisfeld@t-online.de">e.eisfeld@t-online.de</a></p>
+    </div>
+  </div>
+
+  <!-- ═══ TOS MODAL ═══ -->
+  <div id="tosModal" class="tos-modal hidden">
+    <div class="tos-modal-box">
+      <div class="tos-modal-header">
+        <div class="brand-icon-small">&#9654;</div>
+        <span>LernyTube – Nutzungsbedingungen</span>
+      </div>
+      <div class="tos-modal-body" id="tos-content">
+        <div class="tos-loading">Wird geladen…</div>
+      </div>
+      <div class="tos-modal-footer">
+        <label class="tos-checkbox-wrap">
+          <input type="checkbox" id="tos-checkbox" onchange="document.getElementById('tos-accept-btn').disabled=!this.checked">
+          Ich habe die Nutzungsbedingungen gelesen und stimme ihnen zu.
+        </label>
+        <button id="tos-accept-btn" class="btn-gold" disabled onclick="acceptTos()">
+          Zustimmen &amp; fortfahren
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/api.js?v=20260406"></script>
+  <script src="/static/js/auth.js?v=20260406"></script>
+</body>
+</html>
