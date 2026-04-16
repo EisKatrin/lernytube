@@ -1,0 +1,28 @@
+#!/bin/bash
+# Pre-commit hook: block commits containing secrets
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$STAGED" ] && exit 0
+
+FOUND=0
+for file in $STAGED; do
+    [[ "$file" == *.jpg ]] || [[ "$file" == *.png ]] || [[ "$file" == *.env.example ]] && continue
+    
+    # Google API Key
+    if git diff --cached -- "$file" | grep -qP 'AIzaSy[A-Za-z0-9_-]{33}'; then
+        echo "BLOCKED: Google API Key found in $file"; FOUND=1
+    fi
+    # Hardcoded MongoDB URI with password
+    if git diff --cached -- "$file" | grep -qP 'mongodb://\w+:\w+@'; then
+        echo "BLOCKED: MongoDB credentials found in $file"; FOUND=1
+    fi
+    # GitHub PAT
+    if git diff --cached -- "$file" | grep -qP 'github_pat_[A-Za-z0-9_]+'; then
+        echo "BLOCKED: GitHub PAT found in $file"; FOUND=1
+    fi
+done
+
+if [ $FOUND -ne 0 ]; then
+    echo "Commit aborted. Use .env + env_file instead of hardcoding secrets."
+    exit 1
+fi
+exit 0
