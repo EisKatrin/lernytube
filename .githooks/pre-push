@@ -1,0 +1,16 @@
+#!/bin/bash
+# Pre-push hook: block pushes when the remote URL embeds credentials.
+# Complements .githooks/pre-commit (which scans staged content).
+remote_name="$1"
+remote_url="$2"
+
+if echo "$remote_url" | grep -qE 'github_pat_[A-Za-z0-9_]+|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|//[^/]+:[^/@]+@'; then
+    echo "BLOCKED: push remote URL contains an embedded credential."
+    echo "  remote: $remote_name"
+    echo
+    echo "Fix:"
+    echo "  git remote set-url $remote_name https://github.com/USER/REPO.git"
+    echo "  gh auth setup-git   # or: git config --global credential.helper store"
+    exit 1
+fi
+exit 0
