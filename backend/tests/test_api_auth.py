@@ -3,7 +3,7 @@
 import pytest
 import pytest_asyncio
 
-pytestmark = pytest.mark.asyncio
+pytestmark = [pytest.mark.asyncio, pytest.mark.usefixtures("mock_db")]
 
 
 async def test_register_erfolgreich(client):

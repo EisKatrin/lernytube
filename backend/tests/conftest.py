@@ -18,7 +18,7 @@ from main import app
 from auth_utils import hash_password, create_token
 
 
-@pytest_asyncio.fixture(autouse=True)
+@pytest_asyncio.fixture
 async def mock_db():
     """Nutzt eine Test-Datenbank auf dem echten MongoDB und leert sie nach jedem Test."""
     client = AsyncIOMotorClient(MONGO_URI, serverSelectionTimeoutMS=5000)
