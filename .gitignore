@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
+.mcp.json
 backend/static/uploads/*
 !backend/static/uploads/.gitkeep
 backend/static/frames/*

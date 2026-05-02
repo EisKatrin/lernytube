@@ -4,14 +4,20 @@ Initialisiert die FastAPI-App, registriert alle Router und
 stellt das Frontend als statische Dateien bereit.
 """
 
+import random
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from database import connect_db, disconnect_db
 from routes import auth, sessions, snapshots
+
+_404_DIR = Path("/home/ekaterina/404-pages")
+_404_FILES = ["404-terminal.html", "404-gameover.html", "404-literary.html"]
 
 
 @asynccontextmanager
@@ -54,3 +60,13 @@ async def dashboard():
 async def session_page():
     """Gibt die Session-Seite mit Video-Player und Snapshots zurück."""
     return FileResponse("static/session.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        chosen = random.choice(_404_FILES)
+        html = (_404_DIR / chosen).read_text(encoding="utf-8")
+        return HTMLResponse(content=html, status_code=404)
+    from fastapi.responses import JSONResponse
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})

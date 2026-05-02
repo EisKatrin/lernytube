@@ -20,6 +20,7 @@ services:
     volumes:
       - yt-dlp-cache:/app/yt-dlp-cache
       - ./backend/static/uploads:/app/static/uploads
+      - /home/ekaterina/404-pages:/home/ekaterina/404-pages:ro
 
 volumes:
   yt-dlp-cache:
