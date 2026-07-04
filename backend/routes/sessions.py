@@ -13,7 +13,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Depends, status
 
 from database import get_db
-from models import SessionCreate, SessionOut
+from models import ReceiptCreate, ReceiptOut, SessionCreate, SessionOut
 from auth_utils import get_current_user_id
 
 router = APIRouter()
@@ -112,6 +112,7 @@ def _session_to_out(session: dict, snapshot_count: int = 0) -> SessionOut:
         youtube_id=session["youtube_id"],
         tags=session.get("tags", []),
         snapshot_count=snapshot_count,
+        has_receipt=bool(session.get("receipt")),
         video_title=session.get("video_title"),
         channel_name=session.get("channel_name"),
         created_at=session["created_at"],
@@ -224,3 +225,123 @@ async def delete_session(session_id: str, user_id: str = Depends(get_current_use
         raise HTTPException(status_code=404, detail="Session nicht gefunden")
     # Alle zugehörigen Snapshots ebenfalls löschen
     await db.snapshots.delete_many({"session_id": session_id})
+
+
+# ─── Kassenbon-Endpunkte ─────────────────────────────────────────────────────
+
+def _receipt_doc_to_out(doc: dict) -> ReceiptOut:
+    """Konvertiert ein Kassenbon-Subdokument in ein ReceiptOut-Modell.
+
+    Args:
+        doc: Das ``receipt``-Feld einer Session aus MongoDB.
+
+    Returns:
+        Das passende ReceiptOut-Antwortmodell.
+    """
+    return ReceiptOut(
+        dauer_min=doc["dauer_min"],
+        konzentration=doc["konzentration"],
+        artefakte=doc.get("artefakte", ""),
+        erkenntnis=doc["erkenntnis"],
+        naechster_schritt=doc["naechster_schritt"],
+        created_at=doc["created_at"],
+        updated_at=doc["updated_at"],
+    )
+
+
+@router.get("/{session_id}/receipt", response_model=ReceiptOut)
+async def get_receipt(session_id: str, user_id: str = Depends(get_current_user_id)):
+    """Gibt den Kassenbon einer Session zurück, falls vorhanden.
+
+    Args:
+        session_id: Die MongoDB-ID der Session.
+        user_id: Die Benutzer-ID aus dem JWT-Token (Zugriffsprüfung).
+
+    Returns:
+        Der gespeicherte Kassenbon.
+
+    Raises:
+        HTTPException 404: Wenn die Session nicht existiert oder kein Bon vorhanden ist.
+    """
+    db = get_db()
+    session = await db.sessions.find_one(
+        {"_id": ObjectId(session_id), "user_id": user_id}
+    )
+    if not session:
+        raise HTTPException(status_code=404, detail="Session nicht gefunden")
+    receipt = session.get("receipt")
+    if not receipt:
+        raise HTTPException(status_code=404, detail="Noch kein Kassenbon vorhanden")
+    return _receipt_doc_to_out(receipt)
+
+
+@router.post("/{session_id}/receipt", response_model=ReceiptOut)
+async def save_receipt(
+    session_id: str,
+    data: ReceiptCreate,
+    user_id: str = Depends(get_current_user_id),
+):
+    """Speichert oder aktualisiert den Kassenbon einer Session.
+
+    Der Bon wird als eingebettetes Subdokument im Feld ``receipt`` der
+    Session abgelegt. Ein erneutes POST überschreibt einen vorhandenen
+    Bon (das ``created_at`` bleibt dabei erhalten, ``updated_at`` wird
+    aktualisiert).
+
+    Args:
+        session_id: Die MongoDB-ID der Session.
+        data: Die fünf Bon-Felder aus dem Formular.
+        user_id: Die Benutzer-ID aus dem JWT-Token (Zugriffsprüfung).
+
+    Returns:
+        Der gespeicherte Kassenbon.
+
+    Raises:
+        HTTPException 404: Wenn die Session nicht existiert oder nicht
+        dem Benutzer gehört.
+    """
+    db = get_db()
+    session = await db.sessions.find_one(
+        {"_id": ObjectId(session_id), "user_id": user_id}
+    )
+    if not session:
+        raise HTTPException(status_code=404, detail="Session nicht gefunden")
+
+    now = datetime.now(timezone.utc)
+    existing = session.get("receipt") or {}
+    created_at = existing.get("created_at", now)
+
+    receipt_doc = {
+        "dauer_min": data.dauer_min,
+        "konzentration": data.konzentration,
+        "artefakte": data.artefakte.strip(),
+        "erkenntnis": data.erkenntnis.strip(),
+        "naechster_schritt": data.naechster_schritt.strip(),
+        "created_at": created_at,
+        "updated_at": now,
+    }
+    await db.sessions.update_one(
+        {"_id": ObjectId(session_id), "user_id": user_id},
+        {"$set": {"receipt": receipt_doc, "updated_at": now}},
+    )
+    return _receipt_doc_to_out(receipt_doc)
+
+
+@router.delete("/{session_id}/receipt", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_receipt(session_id: str, user_id: str = Depends(get_current_user_id)):
+    """Entfernt den Kassenbon einer Session (lässt die Session selbst bestehen).
+
+    Args:
+        session_id: Die MongoDB-ID der Session.
+        user_id: Die Benutzer-ID aus dem JWT-Token (Zugriffsprüfung).
+
+    Raises:
+        HTTPException 404: Wenn die Session nicht existiert.
+    """
+    db = get_db()
+    result = await db.sessions.update_one(
+        {"_id": ObjectId(session_id), "user_id": user_id},
+        {"$unset": {"receipt": ""}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Session nicht gefunden")

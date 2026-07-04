@@ -28,6 +28,10 @@ let isDirty = false;
 let clockInterval = null;
 /** @type {string|null} ID des Snapshots der auf einen Screenshot wartet */
 let activePasteSnapshotId = null;
+/** @type {number} Aktuell ausgewählter Konzentrations-Wert im Bon-Formular (1–5) */
+let receiptKonzentration = 0;
+/** @type {Object|null} Der zuletzt geladene/gespeicherte Bon dieser Session */
+let currentReceipt = null;
 
 // ─── Initialisierung ──────────────────────────────────────────────
 
@@ -45,6 +49,7 @@ async function init() {
     }
     snapshots = await Snapshots.list(SESSION_ID);
     renderSnapshots();
+    await loadReceiptIfExists();
   } catch (err) {
     alert('Fehler: ' + err.message);
     window.location.href = '/dashboard';
@@ -477,6 +482,282 @@ function exportPdf() {
   const win = window.open('', '_blank');
   if (!win) { alert('Bitte erlaube Popups für diese Seite, um den PDF-Export zu nutzen.'); return; }
   win.document.write(html);
+  win.document.close();
+}
+
+// ─── Kassenbon (Session-Abschluss-Reflexion) ──────────────────────
+
+/**
+ * Lädt einen vorhandenen Bon der Session und markiert den Button entsprechend.
+ *
+ * Wird einmalig beim Laden der Session aufgerufen.
+ * Ein fehlender Bon (404) ist kein Fehlerfall – er wird stillschweigend ignoriert.
+ */
+async function loadReceiptIfExists() {
+  try {
+    currentReceipt = await Receipts.get(SESSION_ID);
+    markReceiptButtonAsFilled();
+  } catch (err) {
+    // Kein Bon vorhanden – das ist der Normalfall vor Abschluss.
+    currentReceipt = null;
+  }
+}
+
+/**
+ * Markiert den Bon-Button optisch als "Bon vorhanden".
+ */
+function markReceiptButtonAsFilled() {
+  const btn = document.getElementById('btn-receipt');
+  if (btn) btn.classList.add('btn-receipt-filled');
+}
+
+/**
+ * Öffnet das Bon-Modal. Wenn bereits ein Bon vorliegt, wird er angezeigt;
+ * sonst wird das Eingabeformular geöffnet (mit Vorbefüllung der Zeit).
+ */
+function openReceiptModal() {
+  document.getElementById('receipt-overlay').classList.remove('hidden');
+  if (currentReceipt) {
+    showReceiptView(currentReceipt);
+  } else {
+    showReceiptForm();
+  }
+}
+
+/**
+ * Schließt beide Bon-Modals (Formular und Anzeige).
+ */
+function closeReceiptModal() {
+  document.getElementById('receipt-overlay').classList.add('hidden');
+  document.getElementById('receipt-form-modal').classList.add('hidden');
+  document.getElementById('receipt-view-modal').classList.add('hidden');
+}
+
+/**
+ * Zeigt das Eingabeformular und befüllt es ggf. mit Werten eines vorhandenen Bons.
+ */
+function showReceiptForm() {
+  document.getElementById('receipt-view-modal').classList.add('hidden');
+  document.getElementById('receipt-form-modal').classList.remove('hidden');
+
+  if (currentReceipt) {
+    document.getElementById('receipt-dauer').value = currentReceipt.dauer_min;
+    document.getElementById('receipt-artefakte').value = currentReceipt.artefakte || '';
+    document.getElementById('receipt-erkenntnis').value = currentReceipt.erkenntnis || '';
+    document.getElementById('receipt-naechster').value = currentReceipt.naechster_schritt || '';
+    setKonzentration(currentReceipt.konzentration);
+  } else {
+    document.getElementById('receipt-dauer').value = guessSessionMinutes();
+    document.getElementById('receipt-artefakte').value =
+      snapshots.length > 0 ? `${snapshots.length} Snapshot${snapshots.length === 1 ? '' : 's'}` : '';
+    document.getElementById('receipt-erkenntnis').value = suggestErkenntnis();
+    document.getElementById('receipt-naechster').value = '';
+    setKonzentration(0);
+  }
+}
+
+/**
+ * Schätzt die Lerndauer aus dem zeitlichen Abstand zwischen erstem und letztem Snapshot.
+ *
+ * @returns {number} Geschätzte Dauer in Minuten – mindestens 1, höchstens 600.
+ *                   Liefert leeren String wenn keine Schätzung möglich.
+ */
+function guessSessionMinutes() {
+  if (snapshots.length < 2) return '';
+  const times = snapshots.map(s => new Date(s.created_at).getTime()).sort((a, b) => a - b);
+  const diffMin = Math.round((times[times.length - 1] - times[0]) / 60000);
+  if (diffMin < 1) return '';
+  return Math.min(diffMin, 600);
+}
+
+/**
+ * Schlägt eine Erkenntnis vor: nimmt die Notiz des letzten Snapshots wenn vorhanden.
+ *
+ * @returns {string} Vorgeschlagener Erkenntnistext oder leerer String.
+ */
+function suggestErkenntnis() {
+  if (snapshots.length === 0) return '';
+  const lastWithNotes = [...snapshots].reverse().find(s => s.notes && s.notes.trim());
+  return lastWithNotes ? lastWithNotes.notes.trim().slice(0, 200) : '';
+}
+
+/**
+ * Setzt den Konzentrations-Wert im Formular und aktualisiert die Punkt-Anzeige.
+ *
+ * @param {number} value - Wert zwischen 1 und 5.
+ */
+function setKonzentration(value) {
+  receiptKonzentration = value;
+  const buttons = document.querySelectorAll('#receipt-konz button');
+  buttons.forEach(btn => {
+    const v = parseInt(btn.dataset.val, 10);
+    btn.classList.toggle('active', v <= value);
+  });
+}
+
+/**
+ * Validiert das Formular und schickt den Bon an die API.
+ */
+async function saveReceipt() {
+  const dauer = parseInt(document.getElementById('receipt-dauer').value, 10);
+  const artefakte = document.getElementById('receipt-artefakte').value.trim();
+  const erkenntnis = document.getElementById('receipt-erkenntnis').value.trim();
+  const naechster = document.getElementById('receipt-naechster').value.trim();
+
+  if (!dauer || dauer < 1 || dauer > 600) {
+    alert('Bitte gib eine gültige Lerndauer ein (1–600 Minuten).');
+    return;
+  }
+  if (receiptKonzentration < 1) {
+    alert('Bitte wähle deine Konzentration (1–5 Punkte).');
+    return;
+  }
+  if (!erkenntnis) {
+    alert('Bitte trage ein, was hängengeblieben ist.');
+    return;
+  }
+  if (!naechster) {
+    alert('Bitte trage einen nächsten Schritt ein.');
+    return;
+  }
+
+  try {
+    currentReceipt = await Receipts.save(SESSION_ID, {
+      dauer_min: dauer,
+      konzentration: receiptKonzentration,
+      artefakte: artefakte,
+      erkenntnis: erkenntnis,
+      naechster_schritt: naechster,
+    });
+    markReceiptButtonAsFilled();
+    showReceiptView(currentReceipt);
+  } catch (err) {
+    alert('Fehler beim Speichern: ' + err.message);
+  }
+}
+
+/**
+ * Wechselt vom Bon zurück zum Eingabeformular (Bearbeiten).
+ */
+function editReceipt() {
+  showReceiptForm();
+}
+
+/**
+ * Zeigt den fertigen Bon als Monospace-Text im Anzeigemodal.
+ *
+ * @param {Object} receipt - Das Bon-Objekt aus der API.
+ */
+function showReceiptView(receipt) {
+  document.getElementById('receipt-form-modal').classList.add('hidden');
+  document.getElementById('receipt-view-modal').classList.remove('hidden');
+  document.getElementById('receipt-output').textContent = formatReceipt(receipt);
+}
+
+/**
+ * Formatiert einen Bon als kassenbonartigen Monospace-Text.
+ *
+ * @param {Object} receipt - Das Bon-Objekt.
+ * @returns {string} Mehrzeiliger Text im Bon-Layout.
+ */
+function formatReceipt(receipt) {
+  const width = 36;
+  const sep = '━'.repeat(width);
+  const title = sessionData ? sessionData.title : 'LernyTube';
+  const date = sessionData ? formatDate(sessionData.date) : '';
+  const dots = '●'.repeat(receipt.konzentration) + '○'.repeat(5 - receipt.konzentration);
+
+  const lines = [];
+  lines.push('🧾  LERN-KASSENBON');
+  lines.push(sep);
+  lines.push(`Session:  ${title}`);
+  if (date) lines.push(`Datum:    ${date}`);
+  lines.push(sep);
+  lines.push(`INVESTIERT:    ${receipt.dauer_min} min`);
+  lines.push(`KONZENTRATION: ${dots}`);
+  if (receipt.artefakte) {
+    lines.push('');
+    lines.push('PRODUZIERT:');
+    lines.push(wrap(receipt.artefakte, width));
+  }
+  lines.push('');
+  lines.push('HÄNGENGEBLIEBEN:');
+  lines.push(wrap(receipt.erkenntnis, width));
+  lines.push('');
+  lines.push('NÄCHSTER SCHRITT:');
+  lines.push(wrap(receipt.naechster_schritt, width));
+  lines.push(sep);
+  lines.push(`Erstellt: ${formatDateTime(receipt.updated_at)}`);
+  return lines.join('\n');
+}
+
+/**
+ * Bricht Text bei Wortgrenzen auf eine maximale Zeilenbreite um.
+ *
+ * @param {string} text  - Der umzubrechende Text.
+ * @param {number} width - Maximale Zeilenbreite in Zeichen.
+ * @returns {string} Mehrzeilig umgebrochener Text.
+ */
+function wrap(text, width) {
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    if ((current + ' ' + word).trim().length > width) {
+      if (current) lines.push(current);
+      current = word;
+    } else {
+      current = (current + ' ' + word).trim();
+    }
+  }
+  if (current) lines.push(current);
+  return lines.join('\n');
+}
+
+/**
+ * Formatiert einen ISO-Zeitstempel als TT.MM.JJJJ HH:MM.
+ *
+ * @param {string} iso - ISO-Zeitstempel.
+ * @returns {string} Lesbares Datum/Zeit-Format.
+ */
+function formatDateTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/**
+ * Kopiert den Bon-Text in die Zwischenablage.
+ */
+async function copyReceipt() {
+  const text = document.getElementById('receipt-output').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Bon in die Zwischenablage kopiert.');
+  } catch (err) {
+    alert('Kopieren fehlgeschlagen: ' + err.message);
+  }
+}
+
+/**
+ * Öffnet ein Druckfenster mit dem Bon im Monospace-Layout.
+ */
+function printReceipt() {
+  const text = document.getElementById('receipt-output').textContent;
+  const win = window.open('', '_blank');
+  if (!win) {
+    alert('Bitte erlaube Popups, um den Bon zu drucken.');
+    return;
+  }
+  win.document.write(`<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>Lern-Kassenbon</title>
+<style>
+  body { font-family: 'Courier New', monospace; font-size: 13px; max-width: 360px; margin: 24px auto; white-space: pre; }
+  @media print { body { margin: 0; } }
+</style></head><body>${escapeHtml(text)}
+<script>window.onload = function() { window.print(); }<\/script>
+</body></html>`);
   win.document.close();
 }
 

@@ -77,6 +77,7 @@ class SessionOut(BaseModel):
     youtube_id: str
     tags: list[str] = []
     snapshot_count: int = 0
+    has_receipt: bool = False
     video_title: Optional[str] = None
     channel_name: Optional[str] = None
     created_at: datetime
@@ -124,3 +125,62 @@ class SnapshotSearchResult(BaseModel):
     timestamp_label: str
     notes: str
     created_at: datetime
+
+
+# ─── Kassenbon-Modelle (Lern-Receipt zum Session-Abschluss) ──────────────────
+
+class ReceiptCreate(BaseModel):
+    """Eingabemodell zum Speichern eines Lern-Kassenbons.
+
+    Ein Kassenbon ist ein kurzes Reflexions-Format, das der Benutzer
+    am Ende einer Lernsession ausfüllt. Es verdichtet die Session auf
+    fünf Kernfragen: Wie lange wurde gelernt, wie konzentriert war
+    die Session, was wurde produziert, was bleibt hängen und wie
+    geht es weiter.
+    """
+
+    dauer_min: int = Field(
+        ...,
+        ge=1,
+        le=600,
+        description="Effektive Lerndauer in Minuten (1–600).",
+    )
+    konzentration: int = Field(
+        ...,
+        ge=1,
+        le=5,
+        description="Selbsteinschätzung der Konzentration auf einer Skala von 1 (schwach) bis 5 (sehr stark).",
+    )
+    artefakte: str = Field(
+        default="",
+        max_length=500,
+        description="Kurze Beschreibung dessen, was produziert wurde (z.B. '1 Funktion, 2 Notizen').",
+    )
+    erkenntnis: str = Field(
+        ...,
+        min_length=1,
+        max_length=500,
+        description="Der eine Satz, der hängenbleibt — die zentrale Einsicht der Session.",
+    )
+    naechster_schritt: str = Field(
+        ...,
+        min_length=1,
+        max_length=500,
+        description="Konkreter nächster Lern- oder Übungsschritt.",
+    )
+
+
+class ReceiptOut(BaseModel):
+    """Ausgabemodell für einen gespeicherten Kassenbon.
+
+    Enthält zusätzlich den Erstellungs- und letzten Aktualisierungszeitpunkt,
+    damit das Frontend Bons als chronologische Reflexionshistorie darstellen kann.
+    """
+
+    dauer_min: int
+    konzentration: int
+    artefakte: str
+    erkenntnis: str
+    naechster_schritt: str
+    created_at: datetime
+    updated_at: datetime

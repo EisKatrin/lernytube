@@ -94,6 +94,13 @@ const Sessions = {
   delete: (id)           => apiFetch(`/api/sessions/${id}`, 'DELETE'),
 };
 
+// ─── Kassenbons (Lern-Receipts) ────────────────────────────────────────
+const Receipts = {
+  get:    (session_id)        => apiFetch(`/api/sessions/${session_id}/receipt`),
+  save:   (session_id, data)  => apiFetch(`/api/sessions/${session_id}/receipt`, 'POST', data),
+  delete: (session_id)        => apiFetch(`/api/sessions/${session_id}/receipt`, 'DELETE'),
+};
+
 // ─── Snapshots ─────────────────────────────────────────────────────────
 const Snapshots = {
   list:        (session_id)            => apiFetch(`/api/snapshots/?session_id=${session_id}`),

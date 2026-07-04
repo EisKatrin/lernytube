@@ -93,7 +93,10 @@ function renderSessions(sessions) {
       ` : ''}
       <div class="session-card-meta">
         <span>${formatDate(s.date)}</span>
-        <span class="session-card-snapshots">📸 ${s.snapshot_count}</span>
+        <span class="session-card-snapshots">
+          ${s.has_receipt ? '<span class="session-card-receipt" title="Mit Kassenbon abgeschlossen">🧾</span>' : ''}
+          📸 ${s.snapshot_count}
+        </span>
       </div>
     </div>
   `).join('');

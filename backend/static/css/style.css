@@ -1297,3 +1297,143 @@ input.valid {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ===================================================================
+   KASSENBON (Lern-Receipt zum Session-Abschluss)
+   =================================================================== */
+
+/* Bon-Button im Snapshot-Header markieren, wenn ein Bon existiert */
+.btn-receipt-filled {
+  background: var(--gold) !important;
+  color: var(--dark) !important;
+  border-color: var(--gold-dark) !important;
+}
+
+/* Kleines Bon-Icon auf Dashboard-Session-Karten */
+.session-card-receipt {
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-size: 0.95rem;
+  vertical-align: -1px;
+}
+
+/* Modal-Container (Formular + Anzeige) */
+.receipt-modal,
+.receipt-view-modal {
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.receipt-intro {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* Formular-Felder */
+.receipt-label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.receipt-label > span {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.receipt-label input[type="number"],
+.receipt-label input[type="text"],
+.receipt-label textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.receipt-label input:focus,
+.receipt-label textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 168, 67, 0.15);
+}
+
+.receipt-label textarea {
+  resize: vertical;
+  min-height: 2.5rem;
+  line-height: 1.5;
+}
+
+/* Konzentrations-Skala (1–5 Punkte) */
+.receipt-rating {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.receipt-rating button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: #C0B498;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.receipt-rating button:hover {
+  border-color: var(--gold);
+}
+
+.receipt-rating button.active {
+  background: var(--gold);
+  border-color: var(--gold-dark);
+  color: var(--dark);
+  transform: scale(1.08);
+}
+
+/* Bon-Ausgabe — kassenbonartig, Monospace, Papier-Optik */
+.receipt-bon {
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #1A1408;
+  background: repeating-linear-gradient(
+    180deg,
+    #FFFEF8 0,
+    #FFFEF8 22px,
+    #F8F3E8 22px,
+    #F8F3E8 23px
+  );
+  padding: 1.25rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  white-space: pre;
+  overflow-x: auto;
+  margin: 0;
+  text-align: left;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+
+/* Responsiv: schmale Bildschirme */
+@media (max-width: 520px) {
+  .receipt-modal,
+  .receipt-view-modal {
+    width: 95%;
+    padding: 1rem;
+  }
+  .receipt-bon { font-size: 12px; padding: 1rem 0.75rem; }
+  .receipt-rating button { width: 32px; height: 32px; }
+}

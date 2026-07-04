@@ -42,6 +42,7 @@
       <div class="snapshots-header">
         <h3>Snapshots <span id="snapshot-count" class="count-badge">0</span></h3>
         <div class="export-buttons">
+          <button class="btn-export" onclick="openReceiptModal()" id="btn-receipt" title="Session abschließen mit Kassenbon">🧾 Bon</button>
           <button class="btn-export" onclick="exportMarkdown()" title="Als Markdown-Datei herunterladen">⬇ MD</button>
           <button class="btn-export" onclick="exportPdf()" title="Als PDF speichern">⬇ PDF</button>
         </div>
@@ -79,6 +80,73 @@
     <div class="modal-actions">
       <button class="btn-danger" onclick="deleteCurrentSnapshot()">🗑 Löschen</button>
       <button class="btn-primary" onclick="saveModalNotes()">💾 Speichern</button>
+    </div>
+  </div>
+
+  <!-- Modal: Kassenbon — Session-Abschluss-Reflexion -->
+  <div id="receipt-overlay" class="modal-overlay hidden" onclick="closeReceiptModal()"></div>
+
+  <!-- Eingabe-Formular -->
+  <div id="receipt-form-modal" class="modal receipt-modal hidden">
+    <div class="modal-header">
+      <h3>🧾 Lern-Kassenbon</h3>
+      <button class="btn-icon" onclick="closeReceiptModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="receipt-intro">
+        Direkt nach der Session festhalten, was hängenbleibt — solange der Kontext noch frisch ist.
+      </p>
+
+      <label class="receipt-label">
+        <span>Investierte Zeit (Minuten)</span>
+        <input type="number" id="receipt-dauer" min="1" max="600" step="1" placeholder="z.B. 45">
+      </label>
+
+      <label class="receipt-label">
+        <span>Konzentration</span>
+        <div class="receipt-rating" id="receipt-konz">
+          <button type="button" data-val="1" onclick="setKonzentration(1)">●</button>
+          <button type="button" data-val="2" onclick="setKonzentration(2)">●</button>
+          <button type="button" data-val="3" onclick="setKonzentration(3)">●</button>
+          <button type="button" data-val="4" onclick="setKonzentration(4)">●</button>
+          <button type="button" data-val="5" onclick="setKonzentration(5)">●</button>
+        </div>
+      </label>
+
+      <label class="receipt-label">
+        <span>Produziert (Artefakte, Entscheidungen)</span>
+        <input type="text" id="receipt-artefakte" maxlength="500" placeholder="z.B. 1 Funktion, 2 Notizen, 1 Frage offen">
+      </label>
+
+      <label class="receipt-label">
+        <span>Was bleibt hängen?</span>
+        <textarea id="receipt-erkenntnis" rows="2" maxlength="500" placeholder="Die eine Sache, die du morgen noch wissen willst"></textarea>
+      </label>
+
+      <label class="receipt-label">
+        <span>Nächster Schritt</span>
+        <textarea id="receipt-naechster" rows="2" maxlength="500" placeholder="Konkrete Übung oder nächste Lerneinheit"></textarea>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeReceiptModal()">Abbrechen</button>
+      <button class="btn-primary" onclick="saveReceipt()">🧾 Bon erstellen</button>
+    </div>
+  </div>
+
+  <!-- Bon-Anzeige -->
+  <div id="receipt-view-modal" class="modal receipt-view-modal hidden">
+    <div class="modal-header">
+      <h3>🧾 Dein Kassenbon</h3>
+      <button class="btn-icon" onclick="closeReceiptModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <pre id="receipt-output" class="receipt-bon"></pre>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="editReceipt()">✎ Bearbeiten</button>
+      <button class="btn-ghost" onclick="copyReceipt()">📋 Kopieren</button>
+      <button class="btn-primary" onclick="printReceipt()">🖨 Drucken</button>
     </div>
   </div>
 
