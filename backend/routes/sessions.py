@@ -67,30 +67,49 @@ def _clean_tags(tags: list[str]) -> list[str]:
 
 
 async def _fetch_video_info(video_id: str) -> dict:
-    """Ruft Videotitel und Kanalname von der YouTube Data API v3 ab."""
-    api_key = os.environ.get("YOUTUBE_API_KEY", "")
-    if not api_key:
-        return {}
-    url = (
-        f"https://www.googleapis.com/youtube/v3/videos"
-        f"?part=snippet&id={video_id}&key={api_key}"
-    )
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(url)
-            if resp.status_code != 200:
-                return {}
-            data = resp.json()
-            items = data.get("items", [])
-            if not items:
-                return {}
-            snippet = items[0].get("snippet", {})
-            return {
-                "video_title": snippet.get("title"),
-                "channel_name": snippet.get("channelTitle"),
-            }
-    except Exception:
-        return {}
+    """Ruft Videotitel und Kanalname ab.
+
+    Strategie:
+    1. YouTube Data API v3 (wenn YOUTUBE_API_KEY gesetzt)
+    2. oEmbed-Fallback (kein Key nötig, öffentlich dokumentiert von YouTube)
+    """
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        api_key = os.environ.get("YOUTUBE_API_KEY", "")
+        if api_key:
+            try:
+                url = (
+                    f"https://www.googleapis.com/youtube/v3/videos"
+                    f"?part=snippet&id={video_id}&key={api_key}"
+                )
+                resp = await client.get(url)
+                if resp.status_code == 200:
+                    items = resp.json().get("items", [])
+                    if items:
+                        snippet = items[0].get("snippet", {})
+                        return {
+                            "video_title": snippet.get("title"),
+                            "channel_name": snippet.get("channelTitle"),
+                        }
+            except Exception:
+                pass
+
+        # oEmbed-Fallback: funktioniert ohne API-Key, liefert Titel + Kanalname
+        try:
+            oembed_url = (
+                f"https://www.youtube.com/oembed"
+                f"?url=https://www.youtube.com/watch?v={video_id}&format=json"
+            )
+            resp = await client.get(oembed_url)
+            if resp.status_code == 200:
+                data = resp.json()
+                return {
+                    "video_title": data.get("title"),
+                    "channel_name": data.get("author_name"),
+                }
+        except Exception:
+            pass
+
+    return {}
 
 
 def _session_to_out(session: dict, snapshot_count: int = 0) -> SessionOut:
