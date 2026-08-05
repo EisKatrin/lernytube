@@ -1437,3 +1437,33 @@ input.valid {
   .receipt-bon { font-size: 12px; padding: 1rem 0.75rem; }
   .receipt-rating button { width: 32px; height: 32px; }
 }
+
+/* ===== KI-HINWEIS-BADGE (Kennzeichnungspflicht seit 02.08.2026) ===== */
+.ki-badge {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 500;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26,20,8,0.85);
+  border: 1px solid var(--gold-dark, #A07828);
+  color: var(--gold, #C9A843);
+  font-size: 1.05rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform .15s ease, background .15s ease;
+}
+.ki-badge:hover {
+  background: rgba(26,20,8,1);
+  transform: scale(1.08);
+}
+.ki-hinweis {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-top: 0.4rem;
+}
