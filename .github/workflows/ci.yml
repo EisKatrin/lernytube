@@ -20,7 +20,7 @@ jobs:
           pip install -r backend/requirements-test.txt
       - name: Run unit tests
         working-directory: backend
-        run: pytest tests/test_auth_utils.py tests/test_models.py tests/test_utils.py -v --tb=short
+        run: pytest tests/test_auth_utils.py tests/test_models.py tests/test_utils.py tests/test_tutor_utils.py -v --tb=short
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
           JWT_SECRET: ci-test-secret
           MONGO_URI: mongodb://localhost:27017/
           MONGO_DB: lernytube_test
-        run: pytest tests/test_api_auth.py tests/test_api_sessions.py tests/test_api_snapshots.py -v --tb=short
+        run: pytest tests/test_api_auth.py tests/test_api_sessions.py tests/test_api_snapshots.py tests/test_api_tutor.py -v --tb=short
 
   deploy:
     runs-on: ubuntu-latest

@@ -34,6 +34,7 @@ let searchTimer = null;
 // ─── Initialisierung ──────────────────────────────────────────────
 const user = getCurrentUser();
 if (user) document.getElementById('username-display').textContent = user.username;
+if (user && user.username === 'EisKatrin') document.getElementById('lernbuch-nav-link').style.display = '';
 document.getElementById('session-date').value = new Date().toISOString().split('T')[0];
 
 loadSessions();

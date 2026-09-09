@@ -1438,6 +1438,124 @@ input.valid {
   .receipt-rating button { width: 32px; height: 32px; }
 }
 
+/* ===================================================================
+   LERNBUCH-SEITE (KI-Lehrer + Themenbaum)
+   =================================================================== */
+.book-page { display: flex; flex-direction: column; height: 100vh; }
+
+.book-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+.book-sidebar {
+  background: #1A1408;
+  border-right: 2px solid #A07828;
+  overflow-y: auto;
+  padding: 0.75rem 0;
+}
+
+.book-sidebar-header { padding: 0 1rem 0.5rem; }
+.book-sidebar-header h3 {
+  color: #F8F3E8;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
+.topic-tree { display: flex; flex-direction: column; }
+
+.topic-node {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: rgba(248,243,232,0.75);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.topic-node:hover { background: #2C2010; color: #E8C96A; }
+.topic-node.active {
+  background: #2C2010;
+  color: #E8C96A;
+  border-left-color: #C9A843;
+}
+.topic-node-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topic-all { font-weight: 700; }
+
+.book-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.book-entries {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.qa-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+.qa-topic-label {
+  font-size: 0.72rem;
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.qa-question { font-weight: 700; margin-bottom: 0.6rem; }
+.qa-answer { color: var(--text); line-height: 1.7; }
+.qa-answer code {
+  background: var(--surface2);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+.qa-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.ask-bar {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border-top: 2px solid var(--border);
+}
+.ask-bar textarea { flex: 1; resize: none; }
+.ask-bar .btn-primary { align-self: flex-end; }
+
+@media (max-width: 720px) {
+  .book-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .book-sidebar { border-right: none; border-bottom: 2px solid #A07828; max-height: 160px; }
+}
+
 /* ===== KI-HINWEIS-BADGE (Kennzeichnungspflicht seit 02.08.2026) ===== */
 .ki-badge {
   position: fixed;

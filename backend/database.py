@@ -24,6 +24,9 @@ async def connect_db() -> None:
     # Indizes für schnelle Abfragen
     await _db.sessions.create_index("user_id")
     await _db.snapshots.create_index("session_id")
+    await _db.topics.create_index("user_id")
+    await _db.qa_entries.create_index("user_id")
+    await _db.qa_entries.create_index("topic_id")
 
 
 async def disconnect_db() -> None:

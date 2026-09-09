@@ -111,3 +111,10 @@ const Snapshots = {
   uploadFrame: (id, frame_data)        => apiFetch(`/api/snapshots/${id}/upload-frame`, 'POST', { frame_data }),
   delete:      (id)                    => apiFetch(`/api/snapshots/${id}`, 'DELETE'),
 };
+
+// ─── Lehrer & Lernbuch ──────────────────────────────────────────────────
+const Tutor = {
+  ask:         (question)  => apiFetch('/api/tutor/ask', 'POST', { question }),
+  getBook:     ()          => apiFetch('/api/tutor/book'),
+  deleteEntry: (id)        => apiFetch(`/api/tutor/entries/${id}`, 'DELETE'),
+};

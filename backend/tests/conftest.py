@@ -26,7 +26,7 @@ async def mock_db():
     database._client = client
     database._db = db
     yield db
-    for name in ["users", "sessions", "snapshots", "settings"]:
+    for name in ["users", "sessions", "snapshots", "settings", "topics", "qa_entries"]:
         await db[name].delete_many({})
     client.close()
 

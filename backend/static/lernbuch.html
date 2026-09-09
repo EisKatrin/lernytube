@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LernyTube – Lernbuch</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=20260909">
+</head>
+<body class="app-page book-page">
+
+  <header class="app-header">
+    <div class="header-left">
+      <a href="/dashboard" class="back-link">← Zurück</a>
+      <span class="logo-icon-wrap small">▶</span>
+      <span class="header-title">📖 Lernbuch</span>
+    </div>
+    <div class="header-right">
+      <span id="username-display" class="username-badge"></span>
+      <button class="btn-ghost" onclick="logout()">Abmelden</button>
+    </div>
+  </header>
+
+  <div class="book-layout">
+
+    <!-- Themenbaum -->
+    <aside class="book-sidebar">
+      <div class="book-sidebar-header"><h3>Themen</h3></div>
+      <div id="topic-tree" class="topic-tree">
+        <div class="loading-state">Lade Themen…</div>
+      </div>
+    </aside>
+
+    <!-- Fragen & Antworten -->
+    <main class="book-main">
+      <div id="book-entries" class="book-entries">
+        <div class="loading-state">Stell deinem Lehrer eine Frage, um zu starten.</div>
+      </div>
+
+      <form class="ask-bar" onsubmit="handleAsk(event)">
+        <textarea id="ask-input" rows="2" placeholder="Frag deinen Lehrer etwas…" required></textarea>
+        <button type="submit" class="btn-primary" id="ask-submit-btn">Fragen</button>
+      </form>
+      <p id="ask-error" class="error-msg hidden"></p>
+    </main>
+
+  </div>
+
+  <a href="/#ki-hinweis" class="ki-badge" title="Diese Inhalte werden durch KI erstellt" aria-label="Hinweis: KI-generierte Inhalte">🤖</a>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/lernbuch.js"></script>
+</body>
+</html>

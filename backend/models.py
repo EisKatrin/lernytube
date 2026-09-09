@@ -184,3 +184,34 @@ class ReceiptOut(BaseModel):
     naechster_schritt: str
     created_at: datetime
     updated_at: datetime
+
+
+# ─── Lehrer & Lernbuch-Modelle ───────────────────────────────────────────────
+
+class TutorAsk(BaseModel):
+    """Eingabemodell für eine Frage an den KI-Lehrer."""
+
+    question: str = Field(..., min_length=3, max_length=2000, description="Die Frage an den Lehrer")
+
+
+class TutorEntryOut(BaseModel):
+    """Ausgabemodell für einen einzelnen Frage-Antwort-Eintrag im Lernbuch."""
+
+    id: str
+    topic_id: str
+    topic_path: list[str] = Field(default=[], description="Themenpfad, z.B. ['Programmieren', 'Python']")
+    question: str
+    answer: str
+    created_at: datetime
+
+
+class TutorTopicNode(BaseModel):
+    """Ein Knoten im Themenbaum des Lernbuchs, mit eigenen Einträgen und Unterthemen."""
+
+    id: str
+    title: str
+    entries: list[TutorEntryOut] = []
+    children: list["TutorTopicNode"] = []
+
+
+TutorTopicNode.model_rebuild()
