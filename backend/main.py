@@ -73,8 +73,13 @@ async def lernbuch_page():
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
-        chosen = random.choice(_404_FILES)
-        html = (_404_DIR / chosen).read_text(encoding="utf-8")
-        return HTMLResponse(content=html, status_code=404)
+        try:
+            chosen = random.choice(_404_FILES)
+            html = (_404_DIR / chosen).read_text(encoding="utf-8")
+            return HTMLResponse(content=html, status_code=404)
+        except OSError:
+            # _404_DIR ist ein Bind-Mount, der nur auf der VPS existiert
+            # (z.B. nicht in der CI-Umgebung) — dann auf JSON zurückfallen.
+            pass
     from fastapi.responses import JSONResponse
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
