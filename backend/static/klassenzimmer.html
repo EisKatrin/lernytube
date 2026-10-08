@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LernyTube – Klassenzimmer</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=20261008">
+</head>
+<body class="app-page book-page">
+
+  <header class="app-header">
+    <div class="header-left">
+      <a href="/dashboard" class="back-link">← Zurück</a>
+      <span class="logo-icon-wrap small">▶</span>
+      <span class="header-title">🏫 Klassenzimmer</span>
+    </div>
+    <div class="header-right">
+      <span id="username-display" class="username-badge"></span>
+      <button class="btn-ghost" onclick="logout()">Abmelden</button>
+    </div>
+  </header>
+
+  <!-- Lehrer-Auswahl -->
+  <main id="agent-picker-view" class="dashboard-main">
+    <div class="dashboard-top">
+      <h2>Welcher Lehrer soll es sein?</h2>
+    </div>
+    <div id="agent-grid" class="agent-grid">
+      <div class="loading-state">Lade Lehrer…</div>
+    </div>
+  </main>
+
+  <!-- Chat mit einem Lehrer -->
+  <div id="chat-view" class="chat-layout hidden">
+    <div class="chat-header">
+      <button class="btn-ghost" onclick="backToPicker()">← Lehrer wechseln</button>
+      <span id="chat-agent-title" class="chat-agent-title"></span>
+    </div>
+    <div id="chat-thread" class="chat-thread">
+      <div class="loading-state">Lade Gespräch…</div>
+    </div>
+    <form class="ask-bar" onsubmit="handleChatSubmit(event)">
+      <textarea id="chat-input" rows="2" placeholder="Schreib deinem Lehrer…" required></textarea>
+      <button type="submit" class="btn-primary" id="chat-submit-btn">Senden</button>
+    </form>
+    <p id="chat-error" class="error-msg hidden"></p>
+  </div>
+
+  <a href="/#ki-hinweis" class="ki-badge" title="Diese Inhalte werden durch KI erstellt" aria-label="Hinweis: KI-generierte Inhalte">🤖</a>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/klassenzimmer.js"></script>
+</body>
+</html>

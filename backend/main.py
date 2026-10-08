@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from database import connect_db, disconnect_db
-from routes import auth, sessions, snapshots, tutor, admin
+from routes import auth, sessions, snapshots, tutor, admin, klassenzimmer
 
 _404_DIR = Path("/home/ekaterina/404-pages")
 _404_FILES = ["404-terminal.html", "404-gameover.html", "404-literary.html"]
@@ -41,6 +41,7 @@ app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])
 app.include_router(snapshots.router, prefix="/api/snapshots", tags=["Snapshots"])
 app.include_router(tutor.router, prefix="/api/tutor", tags=["Lehrer & Lernbuch"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin-Dashboard"])
+app.include_router(klassenzimmer.router, prefix="/api/klassenzimmer", tags=["Klassenzimmer"])
 
 # Statische Dateien (CSS, JS, Bilder) einbinden
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -68,6 +69,12 @@ async def session_page():
 async def lernbuch_page():
     """Gibt die Lernbuch-Seite mit dem KI-Lehrer zurück."""
     return FileResponse("static/lernbuch.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+
+
+@app.get("/klassenzimmer", include_in_schema=False)
+async def klassenzimmer_page():
+    """Gibt die Klassenzimmer-Seite mit der Lehrer-Auswahl zurück."""
+    return FileResponse("static/klassenzimmer.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 
 @app.exception_handler(StarletteHTTPException)

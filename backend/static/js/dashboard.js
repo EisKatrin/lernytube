@@ -35,6 +35,9 @@ let searchTimer = null;
 const user = getCurrentUser();
 if (user) document.getElementById('username-display').textContent = user.username;
 if (user && user.username === 'EisKatrin') document.getElementById('lernbuch-nav-link').style.display = '';
+// Klassenzimmer: Liste erweitern, sobald weitere Accounts (z.B. ein Freund) freigeschaltet werden.
+const KLASSENZIMMER_NUTZER = ['EisKatrin'];
+if (user && KLASSENZIMMER_NUTZER.includes(user.username)) document.getElementById('klassenzimmer-nav-link').style.display = '';
 document.getElementById('session-date').value = new Date().toISOString().split('T')[0];
 
 loadSessions();

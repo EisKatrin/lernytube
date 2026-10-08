@@ -118,3 +118,10 @@ const Tutor = {
   getBook:     ()          => apiFetch('/api/tutor/book'),
   deleteEntry: (id)        => apiFetch(`/api/tutor/entries/${id}`, 'DELETE'),
 };
+
+// ─── Klassenzimmer (Lehrer-Agenten) ──────────────────────────────────────
+const Klassenzimmer = {
+  listAgents: ()                   => apiFetch('/api/klassenzimmer/agents'),
+  chat:       (agent_id, message)  => apiFetch('/api/klassenzimmer/chat', 'POST', { agent_id, message }),
+  history:    (agent_id)           => apiFetch(`/api/klassenzimmer/history?agent_id=${encodeURIComponent(agent_id)}`),
+};
