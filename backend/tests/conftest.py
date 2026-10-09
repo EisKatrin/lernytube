@@ -49,6 +49,7 @@ async def registered_user(mock_db):
         "password_hash": hash_password("MeinTestPasswort!1"),
         "created_at": datetime.now(timezone.utc),
         "tos_accepted": False,
+        "email_verified": True,
     }
     result = await mock_db.users.insert_one(user_doc)
     user_id = str(result.inserted_id)

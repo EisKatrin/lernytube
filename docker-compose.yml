@@ -11,6 +11,7 @@ services:
       - MONGO_DB=lernytube_db
       - JWT_EXPIRE_HOURS=48
       - ENGINE_BASE_URL=https://agenten.eiskopani.de
+      - APP_BASE_URL=https://lernytube.eiskopani.de
     labels:
       - traefik.enable=true
       - traefik.http.routers.lernytube.rule=Host(`lernytube.eiskopani.de`)

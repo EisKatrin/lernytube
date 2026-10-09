@@ -45,6 +45,7 @@ class UserOut(BaseModel):
     email: str
     created_at: datetime
     tos_accepted: bool = False
+    email_verified: bool = False
 
 
 class Token(BaseModel):

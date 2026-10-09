@@ -240,6 +240,7 @@ def seed(reset: bool = False) -> None:
         "created_at": datetime.now(timezone.utc),
         "tos_accepted": True,
         "tos_accepted_at": datetime.now(timezone.utc),
+        "email_verified": True,
     }
     user_id = str(db.users.insert_one(user_doc).inserted_id)
     print(f"✓ Demo-User erstellt: {DEMO_USER['username']} / {DEMO_USER['password']}")

@@ -22,8 +22,8 @@ def test_register_tab_umschalten(page):
     expect(page.locator("#reg-password")).to_be_visible()
 
 
-def test_registrierung_und_redirect(page):
-    """Neuer User registriert sich und wird zum Dashboard weitergeleitet."""
+def test_registrierung_zeigt_bestaetigungshinweis(page):
+    """Neuer User registriert sich und sieht den Hinweis, die E-Mail zu bestätigen."""
     unique = uuid.uuid4().hex[:8]
 
     page.goto("/")
@@ -36,7 +36,7 @@ def test_registrierung_und_redirect(page):
 
     page.click("#register-form button[type='submit']")
 
-    # Warte auf Redirect (ToS oder Dashboard)
-    page.wait_for_timeout(3000)
-    # Nach erfolgreicher Registrierung sollte URL sich geändert haben
-    assert page.url != "https://lernytube.eiskopani.de/" or page.locator("#tosModal").is_visible()
+    # Registrierung loggt nicht mehr automatisch ein — stattdessen Hinweis
+    # zur E-Mail-Bestätigung, kein Zugriff auf das Dashboard ohne Bestätigung.
+    expect(page.locator("#verify-notice")).to_be_visible()
+    assert page.url == "https://lernytube.eiskopani.de/"

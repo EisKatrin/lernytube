@@ -562,6 +562,26 @@ body {
 }
 .auth-error.hidden { display: none; }
 
+.auth-success {
+  color: var(--success);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 4px;
+  background: rgba(39,174,96,0.1);
+  border: 1px solid rgba(39,174,96,0.3);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+}
+.auth-success.hidden { display: none; }
+
+.verify-notice {
+  text-align: center;
+  padding: 8px 4px;
+}
+.verify-notice.hidden { display: none; }
+.verify-notice h3 { color: var(--gold); margin-bottom: 8px; }
+.verify-notice p { color: var(--cream-2); font-size: 0.9rem; line-height: 1.5; }
+
 .switch-hint {
   text-align: center;
   font-size: 0.82rem;

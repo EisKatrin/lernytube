@@ -8,6 +8,22 @@ if (getToken()) {
 }
 
 /**
+ * Zeigt den erfolgreichen Hinweis nach E-Mail-Bestätigung bzw. Verify-Fehler,
+ * wenn der Benutzer über den Link aus der Bestätigungs-E-Mail zurückkommt.
+ */
+(function handleVerifyRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const successEl = document.getElementById('auth-success');
+
+  if (params.has('email_verified')) {
+    successEl.textContent = 'E-Mail-Adresse bestätigt! Du kannst dich jetzt anmelden.';
+    successEl.classList.remove('hidden');
+  } else if (params.get('verify_error') === 'invalid') {
+    showError('Der Bestätigungslink ist ungültig oder wurde bereits verwendet.');
+  }
+})();
+
+/**
  * Wechselt zwischen Login- und Registrierungs-Tab.
  */
 function showTab(tab) {
@@ -19,6 +35,7 @@ function showTab(tab) {
   loginForm.classList.toggle('hidden', tab !== 'login');
   registerForm.classList.toggle('hidden', tab !== 'register');
   errorEl.classList.add('hidden');
+  document.getElementById('verify-notice').classList.add('hidden');
 
   buttons.forEach((btn, i) => {
     btn.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
@@ -148,12 +165,24 @@ async function handleRegister(event) {
   const password = document.getElementById('reg-password').value;
 
   try {
-    const res = await Auth.register(username, email, password);
-    saveAuth(res.access_token, res.user);
-    await showTosModal();
+    await Auth.register(username, email, password);
+    showVerifyNotice(email);
   } catch (err) {
     showError(err.message);
   }
+}
+
+/**
+ * Zeigt nach erfolgreicher Registrierung den Hinweis, die E-Mail zu bestätigen,
+ * statt den Benutzer direkt einzuloggen.
+ */
+function showVerifyNotice(email) {
+  document.getElementById('login-form').classList.add('hidden');
+  document.getElementById('register-form').classList.add('hidden');
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('auth-error').classList.add('hidden');
+  document.getElementById('verify-notice-email').textContent = email;
+  document.getElementById('verify-notice').classList.remove('hidden');
 }
 
 // ─── Nutzungsbedingungen Modal ─────────────────────────────────────────────

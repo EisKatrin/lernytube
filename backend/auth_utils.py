@@ -5,6 +5,7 @@ und tokenbasierte Authentifizierung.
 """
 
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -44,6 +45,15 @@ def verify_password(plain: str, hashed: str) -> bool:
         True wenn das Passwort übereinstimmt, sonst False.
     """
     return pwd_context.verify(plain, hashed)
+
+
+def generate_verification_token() -> str:
+    """Erstellt ein zufälliges, nicht erratbares Token zur E-Mail-Bestätigung.
+
+    Returns:
+        Ein URL-sicheres Zufalls-Token.
+    """
+    return secrets.token_urlsafe(32)
 
 
 def create_token(user_id: str) -> str:
