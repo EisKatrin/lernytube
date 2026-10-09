@@ -27,20 +27,22 @@ def send_verification_email(to_email: str, username: str, token: str) -> bool:
     verify_link = f"{base_url}/api/auth/verify-email?token={token}"
 
     if not _email_configured():
-        logger.info(
-            "E-Mail-Versand nicht konfiguriert (EMAIL_SMTP_USER/PASSWORD fehlen) — "
-            "Bestätigungslink nur geloggt für %s: %s", to_email, verify_link,
+        logger.warning(
+            "E-Mail-Versand nicht konfiguriert oder fehlgeschlagen — "
+            "Bestätigungsmail an %s wurde NICHT verschickt. Das Konto bleibt "
+            "unbestätigt, bis die Mail per /api/auth/resend-verification "
+            "erneut gesendet werden kann.", to_email,
         )
         return False
 
-    host = os.environ.get("EMAIL_SMTP_HOST", "smtp.gmail.com")
-    port = int(os.environ.get("EMAIL_SMTP_PORT", "587"))
+    host = os.environ.get("EMAIL_SMTP_HOST", "smtp.hostinger.com")
+    port = int(os.environ.get("EMAIL_SMTP_PORT", "465"))
     user = os.environ["EMAIL_SMTP_USER"]
     password = os.environ["EMAIL_SMTP_PASSWORD"]
 
     msg = EmailMessage()
     msg["Subject"] = "Bitte bestätige deine E-Mail-Adresse – LernyTube"
-    msg["From"] = user
+    msg["From"] = f"LernyTube <{user}>"
     msg["To"] = to_email
     msg.set_content(
         f"Hallo {username},\n\n"
@@ -53,10 +55,15 @@ def send_verification_email(to_email: str, username: str, token: str) -> bool:
     )
 
     try:
-        with smtplib.SMTP(host, port, timeout=10) as smtp:
-            smtp.starttls()
-            smtp.login(user, password)
-            smtp.send_message(msg)
+        if port == 465:
+            with smtplib.SMTP_SSL(host, port, timeout=10) as smtp:
+                smtp.login(user, password)
+                smtp.send_message(msg)
+        else:
+            with smtplib.SMTP(host, port, timeout=10) as smtp:
+                smtp.starttls()
+                smtp.login(user, password)
+                smtp.send_message(msg)
         return True
     except Exception:
         logger.exception("Bestätigungs-E-Mail konnte nicht an %s gesendet werden", to_email)

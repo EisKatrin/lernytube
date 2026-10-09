@@ -201,6 +201,7 @@
         </form>
 
         <p id="auth-error" class="auth-error hidden"></p>
+        <p id="resend-link" class="switch-hint hidden"><a href="#" onclick="resendVerification();return false;">Bestätigungslink erneut senden</a></p>
         <p id="auth-success" class="auth-success hidden"></p>
 
         <div id="verify-notice" class="verify-notice hidden">
@@ -208,6 +209,7 @@
           <p>Wir haben eine Bestätigungs-E-Mail an <strong id="verify-notice-email"></strong> geschickt.
              Bitte klicke auf den Link in der E-Mail, um dein Konto zu aktivieren
              (ggf. auch im Spam-Ordner nachsehen).</p>
+          <p class="switch-hint"><a href="#" id="verify-notice-resend" onclick="resendVerification();return false;">Keine E-Mail erhalten? Link erneut senden</a></p>
           <p class="switch-hint"><a href="#" onclick="showTab('login');return false;">Zur Anmeldung</a></p>
         </div>
       </div>

@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.responses import RedirectResponse
 
 from database import get_db
-from models import UserRegister, UserLogin, Token, UserOut
+from models import UserRegister, UserLogin, ResendVerification, Token, UserOut
 from auth_utils import (
     hash_password,
     verify_password,
@@ -75,6 +75,27 @@ async def verify_email(token: str):
         {"$set": {"email_verified": True}, "$unset": {"verification_token": ""}},
     )
     return RedirectResponse(url="/?email_verified=1")
+
+
+@router.post("/resend-verification")
+async def resend_verification(data: ResendVerification):
+    """Verschickt die Bestätigungs-E-Mail erneut, falls das Konto existiert und unbestätigt ist.
+
+    Gibt immer dieselbe generische Antwort zurück, um nicht preiszugeben,
+    ob ein Benutzername existiert.
+    """
+    db = get_db()
+    user = await db.users.find_one({"username": data.username})
+    if user and not user.get("email_verified", False):
+        new_token = generate_verification_token()
+        await db.users.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"verification_token": new_token}},
+        )
+        send_verification_email(user["email"], user["username"], new_token)
+    return {
+        "message": "Falls das Konto existiert und noch nicht bestätigt ist, wurde eine neue Bestätigungs-E-Mail verschickt.",
+    }
 
 
 @router.post("/login", response_model=Token)

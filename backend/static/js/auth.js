@@ -36,6 +36,7 @@ function showTab(tab) {
   registerForm.classList.toggle('hidden', tab !== 'register');
   errorEl.classList.add('hidden');
   document.getElementById('verify-notice').classList.add('hidden');
+  document.getElementById('resend-link').classList.add('hidden');
 
   buttons.forEach((btn, i) => {
     btn.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
@@ -62,6 +63,8 @@ function togglePwd(fieldId, btn) {
 /**
  * Login-Handler.
  */
+let lastAuthUsername = null;
+
 async function handleLogin(event) {
   event.preventDefault();
   const username = document.getElementById('login-username').value.trim();
@@ -71,6 +74,27 @@ async function handleLogin(event) {
     const res = await Auth.login(username, password);
     saveAuth(res.access_token, res.user);
     window.location.href = '/dashboard';
+  } catch (err) {
+    showError(err.message);
+    lastAuthUsername = username;
+    document.getElementById('resend-link').classList.toggle('hidden', !err.message.includes('bestätige'));
+  }
+}
+
+/**
+ * Fordert über /api/auth/resend-verification erneut eine Bestätigungs-E-Mail an.
+ */
+async function resendVerification() {
+  if (!lastAuthUsername) return;
+  const link = document.getElementById('resend-link');
+  const noticeLink = document.getElementById('verify-notice-resend');
+  try {
+    await Auth.resendVerification(lastAuthUsername);
+    document.getElementById('auth-success').textContent =
+      'Falls das Konto existiert und noch nicht bestätigt ist, wurde eine neue Bestätigungs-E-Mail verschickt.';
+    document.getElementById('auth-success').classList.remove('hidden');
+    link.classList.add('hidden');
+    if (noticeLink) noticeLink.textContent = 'Bestätigungslink wurde erneut gesendet';
   } catch (err) {
     showError(err.message);
   }
@@ -166,7 +190,7 @@ async function handleRegister(event) {
 
   try {
     await Auth.register(username, email, password);
-    showVerifyNotice(email);
+    showVerifyNotice(username, email);
   } catch (err) {
     showError(err.message);
   }
@@ -176,13 +200,14 @@ async function handleRegister(event) {
  * Zeigt nach erfolgreicher Registrierung den Hinweis, die E-Mail zu bestätigen,
  * statt den Benutzer direkt einzuloggen.
  */
-function showVerifyNotice(email) {
+function showVerifyNotice(username, email) {
   document.getElementById('login-form').classList.add('hidden');
   document.getElementById('register-form').classList.add('hidden');
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   document.getElementById('auth-error').classList.add('hidden');
   document.getElementById('verify-notice-email').textContent = email;
   document.getElementById('verify-notice').classList.remove('hidden');
+  lastAuthUsername = username;
 }
 
 // ─── Nutzungsbedingungen Modal ─────────────────────────────────────────────

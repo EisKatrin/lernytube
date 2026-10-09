@@ -81,6 +81,8 @@ const Auth = {
     apiFetch('/api/auth/register', 'POST', { username, email, password }),
   login: (username, password) =>
     apiFetch('/api/auth/login', 'POST', { username, password }),
+  resendVerification: (username) =>
+    apiFetch('/api/auth/resend-verification', 'POST', { username }),
   me: () => apiFetch('/api/auth/me'),
 };
 

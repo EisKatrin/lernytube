@@ -37,6 +37,12 @@ class UserLogin(BaseModel):
     password: str
 
 
+class ResendVerification(BaseModel):
+    """Eingabemodell zum erneuten Versand der Bestätigungs-E-Mail."""
+
+    username: str
+
+
 class UserOut(BaseModel):
     """Ausgabemodell für Benutzerdaten (ohne Passwort-Hash)."""
 

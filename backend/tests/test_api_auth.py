@@ -105,6 +105,26 @@ async def test_verify_email_ungueltiges_token(client):
     assert "verify_error=invalid" in resp.headers["location"]
 
 
+async def test_resend_verification_erstellt_neues_token(client, mock_db):
+    await client.post("/api/auth/register", json={
+        "username": "erneutsenden",
+        "email": "erneutsenden@example.com",
+        "password": "SehrSicheresPasswort!1",
+    })
+    altes_token = (await mock_db.users.find_one({"username": "erneutsenden"}))["verification_token"]
+
+    resp = await client.post("/api/auth/resend-verification", json={"username": "erneutsenden"})
+    assert resp.status_code == 200
+
+    user = await mock_db.users.find_one({"username": "erneutsenden"})
+    assert user["verification_token"] != altes_token
+
+
+async def test_resend_verification_unbekannter_user_kein_fehler(client):
+    resp = await client.post("/api/auth/resend-verification", json={"username": "gibtsNicht"})
+    assert resp.status_code == 200
+
+
 async def test_me_mit_token(client, auth_headers):
     resp = await client.get("/api/auth/me", headers=auth_headers)
     assert resp.status_code == 200
